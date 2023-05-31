@@ -8,16 +8,13 @@ using Tower_Defense.Menu;
 
 namespace Tower_Defense.Levels;
 
-public sealed class FirstLevel : Core.Menu
+public sealed class FirstLevel : Menu<FirstLevel>
 {
-    private static FirstLevel _object;
-    
-    public static FirstLevel GetObject => _object ??= new FirstLevel();
-    
     private const double HealthDefault = 20;
     
-    public double Health = HealthDefault;
-    
+    private double _health = HealthDefault;
+    private double _speed = 1;
+        
     public static int StartCount;
     
     private  Button _pause;
@@ -29,105 +26,67 @@ public sealed class FirstLevel : Core.Menu
 
     private  List<int> _wave;
     private  List<List<Vector2>> _tracks;
-    private  DateTime _time;
+    private  DateTime? _time;
     private Texture2D _texture;
 
-    private int _number;
-
-    private List<Opponent> _opponents = new ();
+    private readonly List<Opponent> _opponents = new ();
     
-    private  Texture2D _background;
-    private  Texture2D _path;
-    private  Texture2D _health;
-    private  SpriteFont _font;
+    private Image _healthImage;
     
-    private  List<Vector2> _field;
-
-    private double _speed = 1;
+    private  List<Image> _map;
     
-    private FirstLevel() { LoadContent(); }
-    
-    private void PauseButton_Click()
-    {
-        _isPause = true;
-    }
-    
-    private void SpeedButton_Click()
-    {
-        _speed = _speed switch
-        {
-            1 => 3,
-            3 => 5,
-            5 => 10,
-            10 => 0.5,
-            0.5 => 1,
-            _ => _speed
-        };
-    }
-    
-    private void PauseMenuButton_Click()
-    {
-        GameView.ChangeMenu(Menu.GameMenu.GetObject);
-    }
-    
-    private void PauseExitMenuButton_Click()
-    {
-        _isPause = false;
-    }
-
     protected override void LoadContent()
     {
-        _background = Content.Load<Texture2D>("Background/Level");
-        _path = Content.Load<Texture2D>("Controls/Path");
-        _health = Content.Load<Texture2D>("Controls/Health");
+        Background = new Background("Background/Level");
         
-        _font = Content.Load<SpriteFont>("Fonts/Font1");
+        _healthImage = new Image("Controls/Health", new Vector2(710, 10))
+        {
+            Texts = new Dictionary<string, Text>
+            {
+                {"text", new Text("Fonts/Font1", new Vector2(700, 28), $"{_health}")}
+            }
+        };
         
-        _wave = new List<int> { 1, 3, 5, 7, 8, 9, 11, 13, 15, 17, 21, 25, 25, 27, 29, 29, 29, 29, 29, 29, 30, 31};
+        _map = new List<Image>
+        {
+            new ("Controls/Path", new Vector2(100, 120)),
+            new ("Controls/Path", new Vector2(164, 120)),
+            new ("Controls/Path", new Vector2(228, 120)),
+            new ("Controls/Path", new Vector2(292, 120)),
+            new ("Controls/Path", new Vector2(292, 184)),
+            new ("Controls/Path", new Vector2(292, 248)),
+            new ("Controls/Path", new Vector2(356, 248)),
+            new ("Controls/Path", new Vector2(420, 248)),
+            new ("Controls/Path", new Vector2(484, 248))
+        };
+        
+        _wave = new List<int> { 1, 3, 5, 7, 8, 9, 11, 13, 15, 17, 21, 25, 25, 27, 29, 31, 33, 35, 37, 39, 41, 42};
         
         _tracks = new List<List<Vector2>>
         {
             new () { new Vector2(100, 136), new Vector2(315, 136), new Vector2(315, 264), new Vector2(484, 264)}
         };
         
-        _pause = new Button("Controls/Pause")
-        {
-            Position = new Vector2(10, 10),
-            Click = PauseButton_Click
-        };
+        _pause = new Button("Controls/Pause", new Vector2(10, 10), () => _isPause = true);
 
-        _pauseMenu = new Button("Controls/ExitMenu")
-        {
-            Position = new Vector2(299, 214),
-            Click = PauseMenuButton_Click
-        };
+        _pauseMenu = new Button("Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject));
 
-        _speedButton = new Button("Controls/Pause")
-        {
-            Position = new Vector2(10, 300),
-            Click = SpeedButton_Click
-        };
+        _speedButton = new Button("Controls/Pause", new Vector2(10, 300), ()=> _speed = _speed switch {1 => 3, 3 => 5, 5 => 10, 10 => 0.5, 0.5 => 1, _ => _speed});
 
-        _pauseExitMenu = new Button("Controls/Close")
-        {
-            Position = new Vector2(597, 81),
-            Click = PauseExitMenuButton_Click
-        };
-
-        _time = DateTime.Now;
+        _pauseExitMenu = new Button("Controls/Close", new Vector2(597, 81), ()=> _isPause = false);
+        
         _texture = Content.Load<Texture2D>("Controls/O");
-
-        _field = new List<Vector2>
-        {
-            new (100, 120),new (164, 120),new (228, 120),new (292, 120),new (292, 184),new (292, 248),new (356, 248),new (420, 248),new (484, 248)
-        };
     }
 
     public override void Update()
     {
+        _time ??= DateTime.Now;
+        
+        _healthImage.Texts["text"].Caption = $"{_health}";
+        
         if (!_isPause)
         {   
-            if (_opponents.Count == 0 && _wave.Count == 0 || Health == 0)
+            if (_opponents.Count == 0 && _wave.Count == 0 || _health == 0)
             {
                 _pauseMenu.Update();
             }
@@ -136,7 +95,7 @@ public sealed class FirstLevel : Core.Menu
                 _pause.Update();
                 _speedButton.Update();
             
-                foreach (var t in new List<int>(_wave).Where(t => DateTime.Now.Subtract(_time).TotalSeconds >= t/_speed))
+                foreach (var t in new List<int>(_wave).Where(t => DateTime.Now.Subtract((DateTime) _time).TotalSeconds >= t/_speed))
                 {
                     _wave.Remove(t);
                     _opponents.Add(new Opponent(_tracks[0], _texture));
@@ -146,9 +105,9 @@ public sealed class FirstLevel : Core.Menu
                 {
                     _opponents.Remove(o);
 
-                    Health -= 1;
+                    _health -= 1;
                     
-                    if (Health == 0)
+                    if (_health == 0)
                         return;
                 } 
             
@@ -165,23 +124,17 @@ public sealed class FirstLevel : Core.Menu
             _pauseMenu.Update();
             _pauseExitMenu.Update();
         }
-
     }
     
     public override void Draw()
     {
-        Sprite.Begin();
+        Background.Draw();
         
-        Sprite.Draw(_background, new Vector2(0, 0), Color.White);
-        Sprite.Draw(_health, new Vector2(710, 10), Color.White);
+        _healthImage.Draw();
         
-        Sprite.DrawString(_font, $"{Health}", new Vector2(700-_font.MeasureString($"{Health}").X, 28), Color.White);
-        
-        foreach (var f in _field)
-        {
-            Sprite.Draw(_path, f, Color.White);
-        }
-        
+        foreach (var road in _map)
+            road.Draw();
+
         foreach (var o in _opponents)
         {
             o.Draw();
@@ -189,14 +142,14 @@ public sealed class FirstLevel : Core.Menu
         
         if (!_isPause)
         {
-            if (_opponents.Count == 0 && _wave.Count == 0 || Health == 0)
+            if (_opponents.Count == 0 && _wave.Count == 0 || _health == 0)
             {
                 Sprite.Draw(Content.Load<Texture2D>("Controls/EndGame"), new Vector2(163, 88), Color.White);
                 _pauseMenu.Draw();
 
                 var starCount = 0;
 
-                if (Health / HealthDefault >= 0.4)
+                if (_health / HealthDefault >= 0.4)
                 {
                     Sprite.Draw(Content.Load<Texture2D>("Controls/Star+"), new Vector2(342, 120), Color.White);
                     starCount++;
@@ -204,7 +157,7 @@ public sealed class FirstLevel : Core.Menu
                 else
                     Sprite.Draw(Content.Load<Texture2D>("Controls/Star-"), new Vector2(342, 120), Color.White);
 
-                if (Health / HealthDefault >= 0.8)
+                if (_health / HealthDefault >= 0.8)
                 {
                     Sprite.Draw(Content.Load<Texture2D>("Controls/Star+"), new Vector2(384, 120), Color.White);
                     starCount++;
@@ -212,7 +165,7 @@ public sealed class FirstLevel : Core.Menu
                 else
                     Sprite.Draw(Content.Load<Texture2D>("Controls/Star-"), new Vector2(384, 120), Color.White);
 
-                if (Health / HealthDefault >= 1)
+                if (_health / HealthDefault >= 1)
                 {
                     Sprite.Draw(Content.Load<Texture2D>("Controls/Star+"), new Vector2(426, 120), Color.White);
                     starCount++;
@@ -220,7 +173,7 @@ public sealed class FirstLevel : Core.Menu
                 else
                     Sprite.Draw(Content.Load<Texture2D>("Controls/Star-"), new Vector2(426, 120), Color.White);
                 
-                StoreMenu.PointCount += StartCount - StartCount;
+                Game.StartCount += StartCount - StartCount;
                 StartCount = starCount;
             }
             else
@@ -236,8 +189,5 @@ public sealed class FirstLevel : Core.Menu
             _pauseMenu.Draw();
             _pauseExitMenu.Draw();
         }
-        Sprite.End();
     }
-
-    
 }

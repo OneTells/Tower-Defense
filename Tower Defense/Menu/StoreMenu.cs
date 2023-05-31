@@ -1,144 +1,74 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Tower_Defense.Core;
 
 namespace Tower_Defense.Menu;
 
-public class StoreMenu : Core.Menu
+public class StoreMenu : Menu<StoreMenu>
 {
-    private static StoreMenu _object;
-    
-    public static StoreMenu GetObject => _object ??= new StoreMenu();
-    
-    private  List<Button> _buttons;
-    private  Texture2D _background;
-    private  SpriteFont _font;
-    
     private static int _power;
     private static int _length;
     private static int _speed;
-
-    public static int PointCount = 1000;
     
-    private StoreMenu()
+    private void ShopButton_Click(ref int parameter, string parameterName)
     {
-        LoadContent();
-    }
-    
-    private void PowerButton_Click()
-    {
-        if (_power + 1 > PointCount) 
+        if (parameter + 1 > Game.StartCount) 
             return;
         
-        _power += 1;
-        PointCount -= _power + 1;
-        _buttons[0].Texts = new List<string> { $"+{10 * _power}%", $"{_power + 1}" };
-        _buttons[0].TextsVector = new List<Vector2> { new (410, 114), new (520 - _font.MeasureString($"{_power + 1}").X, 145) };
-    }
-    
-    private void LengthButton_Click()
-    {
-        if (_length + 1 > PointCount) 
-            return;
+        parameter += 1;
+        Game.StartCount -= parameter;
         
-        _length += 1;
-        PointCount -= _length + 1;
-        _buttons[2].Texts = new List<string> { $"+{10 * _length}%", $"{_length + 1}" };
-        _buttons[2].TextsVector = new List<Vector2> { new (486, 216), new (520 - _font.MeasureString($"{_length + 1}").X, 250) };
-    }
-    
-    private void SpeedButton_Click()
-    {
-        if (_speed + 1 > PointCount) 
-            return;
+        var texts = ((Button) Components[parameterName]).Texts;
         
-        _speed += 1;
-        PointCount -= _speed + 1;
-        _buttons[1].Texts = new List<string> { $"+{10 * _speed}%", $"{_speed + 1}" };
-        _buttons[1].TextsVector = new List<Vector2> { new (466, 321), new (520 - _font.MeasureString($"{_speed + 1}").X,  353) };
+        texts["percent"].Caption = $"+{10 * parameter}%";
+        texts["star"].Caption = $"{parameter + 1}";
     }
     
-    private void CloseButton_Click()
-    {
-        Tower_Defense.GameView.ChangeMenu(MainMenu.GetObject);
-    }
-    
-    
-
-
     protected override void LoadContent()
     {
-        _background = Content.Load<Texture2D>("Background/Store");
-        _font = Content.Load<SpriteFont>("Fonts/Font1");
+        Background = new Background("Background/Store");
         
-        var powerButton = new Button("Controls/Power", _font)
+        Components = new Dictionary<string, Component>
         {
-            Position = new Vector2(235, 101),
-            Click = PowerButton_Click
-        };
-
-        powerButton.Texts.Add($"+{10*_power}%");
-        powerButton.TextsVector.Add(new Vector2(410, 114));
-        
-        powerButton.Texts.Add($"{_power + 1}");
-        powerButton.TextsVector.Add(new Vector2(520 - _font.MeasureString($"{_power + 1}").X, 145));
-        
-        var lengthGameButton = new Button("Controls/Length", _font)
-        {
-            Position = new Vector2(235, 204),
-            Click = LengthButton_Click
-        };
-
-        lengthGameButton.Texts.Add($"+{10*_length}%");
-        lengthGameButton.TextsVector.Add(new Vector2(486, 216));
-        
-        lengthGameButton.Texts.Add($"{_length + 1}");
-        lengthGameButton.TextsVector.Add(new Vector2(520 - _font.MeasureString($"{_length + 1}").X, 250));
-        
-        var speedButton = new Button("Controls/Speed", _font)
-        {
-            Position = new Vector2(235, 308),
-            Click = SpeedButton_Click
-        };
-
-        speedButton.Texts.Add($"+{10*_speed}%");
-        speedButton.TextsVector.Add(new Vector2(466, 321));
-        
-        speedButton.Texts.Add($"{_speed + 1}");
-        speedButton.TextsVector.Add(new Vector2(520 - _font.MeasureString($"{_speed + 1}").X,  353));
-        
-        var closeButton = new Button("Controls/Close")
-        {
-            Position = new Vector2(604, 1)
-        };
-
-        closeButton.Click += CloseButton_Click;
-        
-        _buttons = new List<Button>
-        {
-            powerButton,
-            speedButton,
-            lengthGameButton,
-            closeButton
+            { "powerButton", new Button("Controls/Power", new Vector2(235, 101), () => ShopButton_Click(ref _power, "powerButton"))
+            {
+                Texts = new Dictionary<string, Text>
+                {
+                    { "percent", new Text("Fonts/Font1", new Vector2(410, 114), $"+{10*_power}%") },
+                    { "star", new Text("Fonts/Font1", new Vector2(520, 145), $"{_power + 1}") }
+                }
+            }},
+            { "speedButton", new Button("Controls/Speed", new Vector2(235, 308), () => ShopButton_Click(ref _speed, "speedButton"))
+            {
+                Texts = new Dictionary<string, Text>
+                {
+                    {"percent", new Text("Fonts/Font1", new Vector2(466, 321), $"+{10*_speed}%")},
+                    {"star", new Text("Fonts/Font1", new Vector2(520, 353), $"{_speed + 1}")}
+                }
+            }},
+            { "lengthButton", new Button("Controls/Length", new Vector2(235, 204), () => ShopButton_Click(ref _length, "lengthButton"))
+            {
+                Texts = new Dictionary<string, Text>
+                {
+                    { "percent", new Text("Fonts/Font1", new Vector2(486, 216), $"+{10*_length}%") },
+                    { "star", new Text("Fonts/Font1", new Vector2(520, 250), $"{_length + 1}") }
+                }
+            }},
+            { "closeButton", new Button("Controls/Close",  new Vector2(604, 1), () => GameView.ChangeMenu(MainMenu.GetObject))}
         };
     }
 
     public override void Update()
     {
-        foreach (var button in _buttons)
-            button.Update();
+        foreach (var (_, component) in Components)
+            component.Update();
     }
+    
     public override void Draw()
     {
-        Sprite.Begin();
-        
-        Sprite.Draw(_background, new Vector2(0, 0), Color.White);
+        Background.Draw();
 
-        foreach (var button in _buttons)
-            button.Draw();
-        
-        Sprite.End();
+        foreach (var (_, component) in Components)
+            component.Draw();
     }
 }

@@ -6,37 +6,24 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Tower_Defense.Core;
 
-public class Button : Component
+public class Image : Component
 {
-    private MouseState _currentMouse;
-        
     private bool _isSelect;
     
     private readonly Texture2D _texture;
     private readonly Vector2 _position;
-    private readonly Action _click;
 
     private Rectangle Rectangle => new ((int) _position.X, (int) _position.Y, _texture.Width, _texture.Height);
 
     public Dictionary<string, Text> Texts = new ();
 
-    public Button(string textureName, Vector2 position, Action click)
+    public Image(string textureName, Vector2 position)
     {
         _texture = Content.Load<Texture2D>(textureName);
         _position = position;
-        _click = click;
     }
     
-    public override void Update()
-    {
-        var previousMouse = _currentMouse;
-        _currentMouse = Mouse.GetState();
-        
-        _isSelect = new Rectangle(_currentMouse.X, _currentMouse.Y, 1, 1).Intersects(Rectangle);
-        
-        if (_isSelect && _currentMouse.LeftButton == ButtonState.Released && previousMouse.LeftButton == ButtonState.Pressed)
-            _click?.Invoke();
-    }
+    public override void Update() {}
     
     public override void Draw()
     {

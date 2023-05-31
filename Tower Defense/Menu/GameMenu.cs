@@ -5,65 +5,26 @@ using Tower_Defense.Levels;
 
 namespace Tower_Defense.Menu;
 
-public sealed class GameMenu : Core.Menu
+public sealed class GameMenu : Menu<GameMenu>
 {
-    private static GameMenu _object;
-    
-    public static GameMenu GetObject => _object ??= new GameMenu();
-    
-    private List<Component> _buttons;
-
-    private GameMenu()
-    {
-        LoadContent();
-    }
-    
-    private static void LevelOneButton_Click()
-    {
-        GameView.ChangeMenu(FirstLevel.GetObject);
-    }
-    
-    private static void BackButton_Click()
-    {
-        GameView.ChangeMenu(MainMenu.GetObject);
-    }
-    
     protected override void LoadContent()
     {
-        var newGameButton = new Button("Controls/New Game")
+        Components = new Dictionary<string, Component>
         {
-            Position = new Vector2(244, 200)
-        };
-        
-        newGameButton.Click += LevelOneButton_Click;
-        
-        var backButton = new Button("Controls/Back")
-        {
-            Position = new Vector2(400, 300)
-        };
-        
-        backButton.Click += BackButton_Click;
-        
-        _buttons = new List<Component>
-        {
-            newGameButton,
-            backButton
+            { "New Game", new Button("Controls/New Game", new Vector2(244, 200), () => GameView.ChangeMenu(FirstLevel.GetObject))},
+            { "Back", new Button("Controls/Back", new Vector2(400, 300), () => GameView.ChangeMenu(MainMenu.GetObject))}
         };
     }
 
     public override void Update()
     {
-        foreach (var button in _buttons)
-            button.Update();
+        foreach (var (_, component) in Components)
+            component.Update();
     }
     
     public override void Draw()
     {
-        Sprite.Begin();
-        
-        foreach (var button in _buttons)
-            button.Draw();
-
-        Sprite.End();
+        foreach (var (_, component) in Components)
+            component.Draw();
     }
 }

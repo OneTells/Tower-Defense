@@ -4,56 +4,31 @@ using Tower_Defense.Core;
 
 namespace Tower_Defense.Menu;
 
-public sealed class MainMenu : Core.Menu
+public sealed class MainMenu : Menu<MainMenu>
 {
-    private static MainMenu _object;
-    
-    public static MainMenu GetObject => _object ??= new MainMenu();
-    
-    private Background _background;
-    private List<Button> _buttons;
-
-    private MainMenu() { LoadContent(); }
-    
     protected override void LoadContent()
     {
-        _background = new Background("Background/Menu");
+        Background = new Background("Background/Menu");
         
-        _buttons = new List<Button>
+        Components = new Dictionary<string, Component>
         {
-           new ("Controls/New Game")
-           {
-               Position = new Vector2(236, 206),
-               Click = () => GameView.ChangeMenu(GameMenu.GetObject)
-           },
-           new ("Controls/Store")
-           {
-               Position = new Vector2(236, 275),
-               Click = () => GameView.ChangeMenu(StoreMenu.GetObject)
-           },
-           new ("Controls/Exit")
-           {
-               Position = new Vector2(401, 275),
-               Click = () => Game.Exit()
-           }
+            { "New Game", new Button("Controls/New Game", new Vector2(236, 206), () => GameView.ChangeMenu(GameMenu.GetObject))},
+            { "Store", new Button("Controls/Store", new Vector2(236, 275), () => GameView.ChangeMenu(StoreMenu.GetObject))},
+            { "Exit", new Button("Controls/Exit", new Vector2(401, 275), () => Game.Exit())}
         };
     }
 
     public override void Update()
     {
-        foreach (var button in _buttons)
-            button.Update();
+        foreach (var (_, component) in Components)
+            component.Update();
     }
     
     public override void Draw()
     {
-        Sprite.Begin();
-        
-        _background.Draw();
+        Background.Draw();
 
-        foreach (var button in _buttons)
-            button.Draw();
-        
-        Sprite.End();
+        foreach (var (_, component) in Components)
+            component.Draw();
     }
 }
