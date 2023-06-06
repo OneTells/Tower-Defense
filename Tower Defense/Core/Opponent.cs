@@ -1,75 +1,102 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Tower_Defense.Core;
 
+public static class OpponentVariants
+{
+    public static readonly (int health, double speed, string textureName) Normal = (10, 1, "Controls/O");
+    public static readonly (int health, double speed, string textureName) Flash = (5, 2, "Controls/O");
+    public static readonly (int health, double speed, string textureName) Hulk = (20, 0.5, "Controls/O");
+}
+
 public class Opponent: Component
 {
-    private readonly List<Vector2> _track;
+    public readonly List<Vector2> Track;
     public int TrackIndex = 1;
-    
-    public Vector2 Position;
 
-    private readonly Texture2D _texture;
+    private Vector2 _position;
 
-    public int Health = 10;
-    public const double SpeedDefault = 1;
-    public double Speed = SpeedDefault;
+    public readonly Texture2D Texture;
+
+    public int Health;
+    public readonly double SpeedDefault;
+    public double Speed;
+    public readonly double TimeOut;
     
-    public Opponent(List<Vector2> track, Texture2D texture)
+    public Opponent(IEnumerable<Vector2> track, (int health, double speed, string textureName) opponent, double timeOut)
     {
-        _track = track;
-        Position = track[0];
-
-        _texture = texture;
+        TimeOut = timeOut;
+        
+        Health = opponent.health;
+        SpeedDefault = opponent.speed;
+        Speed = SpeedDefault;
+        Texture = Content.Load<Texture2D>(opponent.textureName);
+        Track = track.Select(pos=> new Vector2(pos.X - Texture.Width / (float) 2, pos.Y - Texture.Height / (float) 2)).ToList();
+        _position = Track[0];
     }
     
     public override void Draw()
     {
-        Sprite.Draw(_texture, Position, Color.White);
+        Sprite.Draw(Texture, _position, Color.White);
     }
 
     public override void Update()
     {
-        var nextPoint = _track[TrackIndex];
-        var currentPoint = _track[TrackIndex - 1];
+        var nextPoint = Track[TrackIndex];
+        var currentPoint = Track[TrackIndex - 1];
         
-        if (currentPoint.X != nextPoint.X)
+        if (currentPoint.X < nextPoint.X)
         {
-            if (Position.X >= nextPoint.X)
+            if (_position.X + Speed >= nextPoint.X)
             {
-                Position = nextPoint;
+                _position = nextPoint;
                 TrackIndex += 1;
                 return;
             }
-                
-            Position.X += (float) Speed;
+            
+            _position.X += (float) Speed;
             return;
         }
-
-
+        
+        if (currentPoint.X > nextPoint.X)
+        {
+            if (_position.X + Speed <= nextPoint.X)
+            {
+                _position = nextPoint;
+                TrackIndex += 1;
+                return;
+            }
+            
+            _position.X -= (float) Speed;
+            return;
+        }
+        
         if (currentPoint.Y < nextPoint.Y)
         {
-            if (Position.Y >= nextPoint.Y)
+            if (_position.Y + Speed >= nextPoint.Y)
             {
-                Position = nextPoint;
+                _position = nextPoint;
                 TrackIndex += 1;
                 return;
             }
             
-            Position.Y += (float) Speed;
+            _position.Y += (float) Speed;
+            return;
         }
-        else
+        
+        if (currentPoint.Y > nextPoint.Y)
         {
-            if (Position.Y <= nextPoint.Y)
+            if (_position.Y + Speed <= nextPoint.Y)
             {
-                Position = nextPoint;
+                _position = nextPoint;
                 TrackIndex += 1;
                 return;
             }
             
-            Position.Y -= (float) Speed;
+            _position.Y -= (float) Speed;
         }
     }
 }
