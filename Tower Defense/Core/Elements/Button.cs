@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace Tower_Defense.Core;
+namespace Tower_Defense.Core.Elements;
 
 public class Button : Component
 {

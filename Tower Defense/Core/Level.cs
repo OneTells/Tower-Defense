@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Tower_Defense.Core.Elements;
+using Tower_Defense.Core.Level;
 using Tower_Defense.Menu;
 
 namespace Tower_Defense.Core;
@@ -20,7 +22,7 @@ public abstract class Level<T> : Component where T : new ()
             
             _object = new T();
             
-            (_object as Level<T>)?.Initialize();
+            (_object as Level<T>)?.LoadContent();
             (_object as Level<T>)?.Rendering();
             
             (_object as Level<T>)!._waves = (_object as Level<T>)?.InitializationWaves();
@@ -34,43 +36,38 @@ public abstract class Level<T> : Component where T : new ()
     private double _health;
     private double _speed = 1;
 
-    private readonly HashSet<Image> _ways = new ();
+    #region MenuElements
+
     private Image _healthImage;
-
+    
     private Button _speedButton;
-    
-    private List<Button> _pauseButtons;
     private Button _pauseButton;
-    private Image _pauseBackground;
     
-    private bool _isPause;
-    private bool _isEndGame;
-
-    private Button _endGameButton;
-
-    public int StartCount;
-
+    private readonly List<Button> _platforms = new ();
+    private readonly HashSet<Image> _ways = new ();
+    private readonly List<Opponent> _opponents = new ();
+    
+    #endregion
+    
+    private readonly Pause _pause = new ();
+    private readonly EndGame _endGame = new ();
+    private readonly AddTower _addTower = new ();
+    
     private List<List<Opponent>> _waves = new ();
     private int _indexOpponent;
     private int _indexWave;
     
     protected readonly List<List<Vector2>> Tracks = new();
     
-    private readonly List<Button> _platforms = new ();
-    
     private DateTime? _startLevelTime;
-
-    private readonly List<Opponent> _opponents = new ();
-    
-    private List<Vector2> _startPositions;
     
     private Background _background;
 
-    private void Initialize()
+    private void LoadContent()
     {
-        _background = new Background("Background/Level");
-        
         _health = HealthDefault;
+                
+        _background = new Background("Background/Level");
         
         _healthImage = new Image("Controls/Health", new Vector2(710, 10))
         {
@@ -86,21 +83,7 @@ public abstract class Level<T> : Component where T : new ()
             ()=> _speed = _speed switch {1 => 3, 3 => 5, 5 => 10, 10 => 0.5, 0.5 => 1, _ => _speed}
         );
         
-        _pauseButton = new Button("Controls/Pause", new Vector2(10, 10), () => _isPause = true);
-
-        _pauseButtons = new List<Button>
-        {
-            new ("Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject)),
-            new ("Controls/Close", new Vector2(597, 81), ()=> _isPause = false)
-        };
-        
-        _endGameButton = new Button(
-            "Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject)
-        );
-        
-        _pauseBackground = new Image("Controls/PauseMenu", new Vector2(155, 88));
-        
-        _startPositions = new List<Vector2> { new (342, 120), new (384, 120), new (426, 120)};
+        _pauseButton = new Button("Controls/Pause", new Vector2(10, 10), () => _pause.IsPause = true);
     }
     
     private void Rendering()
@@ -141,7 +124,7 @@ public abstract class Level<T> : Component where T : new ()
         }
         
         foreach (var platform in InitializationPlatforms())
-            _platforms.Add(new Button("Controls/Path", platform, () => GameView.ChangeMenu(GameMenu.GetObject)));
+            _platforms.Add(new Button("Controls/Path", platform, () => _addTower.IsAddTower = true));
     }
 
     protected abstract List<(string code, Vector2 start)> InitializationTrackCodes();
@@ -152,19 +135,26 @@ public abstract class Level<T> : Component where T : new ()
     
     public override void Update()
     {
-        if (_isEndGame)
+        if (_endGame.IsEndGame)
         {
-            _endGameButton.Update();
+            _endGame.Update();
             return;
         }
         
-        if (_isPause)
+        if (_pause.IsPause)
         {
-            foreach (var pauseButton in _pauseButtons) 
-                pauseButton.Update();
-            
+            _pause.Update();
             return;
         }
+        
+        if (_addTower.IsAddTower)
+        {
+            _addTower.Update();
+            return;
+        }
+        
+        _pauseButton.Update();
+        _speedButton.Update();
         
         if (_opponents.Count == 0 && _indexOpponent == _waves[_indexWave].Count)
         {
@@ -173,10 +163,7 @@ public abstract class Level<T> : Component where T : new ()
         }
         
         _startLevelTime ??= DateTime.Now;
-
-        _pauseButton.Update();
-        _speedButton.Update();
-            
+        
         if (_indexOpponent != _waves[_indexWave].Count && DateTime.Now.Subtract((DateTime) _startLevelTime).TotalSeconds >= _waves[_indexWave][_indexOpponent].TimeOut / _speed)
         {
             _opponents.Add(_waves[_indexWave][_indexOpponent]);
@@ -184,35 +171,33 @@ public abstract class Level<T> : Component where T : new ()
             _indexOpponent += 1;
             _startLevelTime = DateTime.Now;
         }
-            
-        foreach (var o in new List<Opponent>(_opponents).Where(o => o.TrackIndex >= o.Track.Count))
+        
+        foreach (var opponent in new List<Opponent>(_opponents).Where(opponent => opponent.TrackIndex >= opponent.Track.Count))
         {
             _health -= 1;
             _healthImage.Texts["text"].Caption = $"{_health}";
             
-            _opponents.Remove(o);
+            _opponents.Remove(opponent);
 
-            if (_health != 0) 
-                continue;
-            
-            break;
+            if (_health == 0) 
+                break;
         }
 
         if (_opponents.Count == 0 && _indexWave + 1 == _waves.Count && _indexOpponent == _waves[_indexWave].Count || _health == 0)
         {
             var starCount = (_health / HealthDefault) switch { >= 0.9 => 3, >= 0.8 => 2, >= 0.4 => 1, _ => 0};
             
-            Game.StartCount += int.Max(starCount - StartCount, 0);
-            StartCount = int.Max(starCount, StartCount);
+            Game.StartCount += int.Max(starCount - _endGame.StartCount, 0);
+            _endGame.StartCount = int.Max(starCount, _endGame.StartCount);
             
-            _isEndGame = true;
+            _endGame.IsEndGame = true;
             return;
         }
         
-        foreach (var o in _opponents)
+        foreach (var opponent in _opponents)
         {
-            o.Speed = o.SpeedDefault * _speed;
-            o.Update();
+            opponent.Speed = opponent.SpeedDefault * _speed;
+            opponent.Update();
         }
         
         foreach (var platform in _platforms)
@@ -223,38 +208,32 @@ public abstract class Level<T> : Component where T : new ()
     {
         _background.Draw();
         
-        foreach (var way in _ways)
+        foreach (var way in _ways) 
             way.Draw();
-
-        foreach (var opponent in _opponents)
+        
+        foreach (var platform in _platforms) 
+            platform.Draw();
+        
+        foreach (var opponent in _opponents) 
             opponent.Draw();
         
         _healthImage.Draw();
         
-        foreach (var platform in _platforms)
-            platform.Draw();
-        
-        if (_isPause)
+        if (_pause.IsPause)
         {
-            _pauseBackground.Draw();
-            
-            foreach (var pauseButton in _pauseButtons)
-                pauseButton.Draw();
-            
+            _pause.Draw();
             return;
         }
         
-        if (_isEndGame)
+        if (_endGame.IsEndGame)
         {
-            Sprite.Draw(Content.Load<Texture2D>("Controls/EndGame"), new Vector2(163, 88), Color.White);
-            _endGameButton.Draw();
-            
-            for (var i = 0; i < StartCount; i++)
-                new Image("Controls/Star+", _startPositions[i]).Draw();
-
-            for (var i = StartCount; i < 3; i++)
-                new Image("Controls/Star-", _startPositions[i]).Draw();
-
+            _endGame.Draw();
+            return;
+        }
+        
+        if (_addTower.IsAddTower)
+        {
+            _addTower.Draw();
             return;
         }
         

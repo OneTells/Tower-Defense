@@ -9,7 +9,7 @@ public abstract class Component
     protected static readonly ContentManager Content = Game.Content;
     protected static readonly SpriteBatch Sprite = Game.Sprite;
     
-    public abstract void Draw();
-
     public abstract void Update();
+    
+    public abstract void Draw();
 }

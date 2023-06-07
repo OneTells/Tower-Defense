@@ -45,53 +45,53 @@ public class Opponent: Component
 
     public override void Update()
     {
-        var nextPoint = Track[TrackIndex];
-        var currentPoint = Track[TrackIndex - 1];
+        var currentPoint = Track[TrackIndex];
+        var lastPoint = Track[TrackIndex - 1];
         
-        if (currentPoint.X < nextPoint.X)
+        if (lastPoint.X < currentPoint.X)
         {
-            if (_position.X + Speed >= nextPoint.X)
+            if (_position.X + Speed >= currentPoint.X)
             {
-                _position = nextPoint;
+                _position = currentPoint;
                 TrackIndex += 1;
-                return;
             }
+            else
+                _position.X += (float) Speed;
             
-            _position.X += (float) Speed;
             return;
         }
         
-        if (currentPoint.X > nextPoint.X)
+        if (lastPoint.X > currentPoint.X)
         {
-            if (_position.X + Speed <= nextPoint.X)
+            if (_position.X + Speed <= currentPoint.X)
             {
-                _position = nextPoint;
+                _position = currentPoint;
                 TrackIndex += 1;
-                return;
             }
+            else
+                _position.X -= (float) Speed;
             
-            _position.X -= (float) Speed;
             return;
         }
         
-        if (currentPoint.Y < nextPoint.Y)
+        if (lastPoint.Y < currentPoint.Y)
         {
-            if (_position.Y + Speed >= nextPoint.Y)
+            if (_position.Y + Speed >= currentPoint.Y)
             {
-                _position = nextPoint;
+                _position = currentPoint;
                 TrackIndex += 1;
-                return;
             }
+            else
+                _position.Y += (float) Speed;
             
-            _position.Y += (float) Speed;
             return;
         }
         
-        if (currentPoint.Y > nextPoint.Y)
+        if (lastPoint.Y > currentPoint.Y)
         {
-            if (_position.Y + Speed <= nextPoint.Y)
+            if (_position.Y + Speed <= currentPoint.Y)
             {
-                _position = nextPoint;
+                _position = currentPoint;
                 TrackIndex += 1;
                 return;
             }
