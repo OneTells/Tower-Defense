@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Tower_Defense.Core.Elements;
 using Tower_Defense.Core.Level;
-using Tower_Defense.Menu;
 
 namespace Tower_Defense.Core;
 
@@ -17,10 +15,19 @@ public abstract class Level<T> : Component where T : new ()
     {
         get
         {
-            if (_object != null) 
-                return _object;
+            var star = 0;
+            
+            if (_object != null)
+            {
+                if ((_object as Level<T>)!._endGame.IsEndGame)
+                    star = (_object as Level<T>)!._endGame.StartCount;
+                else
+                    return _object;
+            } 
             
             _object = new T();
+            
+            (_object as Level<T>)!._endGame.StartCount = star;
             
             (_object as Level<T>)?.LoadContent();
             (_object as Level<T>)?.Rendering();
@@ -29,6 +36,11 @@ public abstract class Level<T> : Component where T : new ()
             
             return _object;
         }
+    }
+    
+    public void Reset()
+    {
+        _object = default;
     }
     
     protected abstract double HealthDefault { get; init; }
@@ -59,12 +71,14 @@ public abstract class Level<T> : Component where T : new ()
     
     protected readonly List<List<Vector2>> Tracks = new();
     
-    private DateTime? _startLevelTime;
+    private DateTime _startLevelTime;
     
     private Background _background;
 
     private void LoadContent()
     {
+        _startLevelTime = DateTime.Now;
+        
         _health = HealthDefault;
                 
         _background = new Background("Background/Level");
@@ -162,9 +176,7 @@ public abstract class Level<T> : Component where T : new ()
             _indexOpponent = 0;
         }
         
-        _startLevelTime ??= DateTime.Now;
-        
-        if (_indexOpponent != _waves[_indexWave].Count && DateTime.Now.Subtract((DateTime) _startLevelTime).TotalSeconds >= _waves[_indexWave][_indexOpponent].TimeOut / _speed)
+        if (_indexOpponent != _waves[_indexWave].Count && DateTime.Now.Subtract(_startLevelTime).TotalSeconds >= _waves[_indexWave][_indexOpponent].TimeOut / _speed)
         {
             _opponents.Add(_waves[_indexWave][_indexOpponent]);
 
