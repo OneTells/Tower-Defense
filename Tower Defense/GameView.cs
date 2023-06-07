@@ -13,7 +13,7 @@ public class GameView : Game
     public SpriteBatch Sprite;
     
     private static GraphicsDeviceManager _graphics;
-    private static Core.Component _currentMenu;
+    public static Core.Component CurrentMenu;
     
     public int StartCount = 1000;
     
@@ -26,7 +26,7 @@ public class GameView : Game
     
     public static void ChangeMenu(Core.Component menu)
     {
-      _currentMenu = menu;
+      CurrentMenu = menu;
     }
     
     protected override void Initialize()
@@ -42,12 +42,12 @@ public class GameView : Game
     protected override void LoadContent()
     {
       Sprite = new SpriteBatch(GraphicsDevice);
-      _currentMenu = MainMenu.GetObject;
+      CurrentMenu = MainMenu.GetObject;
     }
     
     protected override void Update(GameTime gameTime)
     {
-      _currentMenu.Update();
+      CurrentMenu.Update();
       base.Update(gameTime);
     }
     
@@ -56,7 +56,7 @@ public class GameView : Game
       GraphicsDevice.Clear(Color.Gray);
       
       Sprite.Begin();
-      _currentMenu.Draw();
+      CurrentMenu.Draw();
       Sprite.End();
       
       base.Draw(gameTime);

@@ -19,7 +19,7 @@ public abstract class Level<T> : Component where T : new ()
             
             if (_object != null)
             {
-                if ((_object as Level<T>)!._endGame.IsEndGame)
+                if ((_object as Level<T>)!._pause.IsReset || (_object as Level<T>)!._endGame.IsReset ||  (_object as Level<T>)!._endGame.IsEndGame)
                     star = (_object as Level<T>)!._endGame.StartCount;
                 else
                     return _object;
@@ -56,7 +56,7 @@ public abstract class Level<T> : Component where T : new ()
     
     #endregion
     
-    private readonly Pause _pause = new ();
+    private readonly Pause<T> _pause = new ();
     private readonly EndGame _endGame = new ();
     private readonly AddTower _addTower = new ();
     
