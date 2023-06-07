@@ -11,6 +11,10 @@ public class Pause: Component
     private Image _background;
     
     public bool IsPause;
+
+    private void ResetLevel()
+    {
+    }
     
     public Pause() { LoadContent(); }
 
@@ -19,7 +23,8 @@ public class Pause: Component
         _buttons = new List<Button>
         {
             new ("Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject)),
-            new ("Controls/Close", new Vector2(597, 81), ()=> IsPause = false)
+            new ("Controls/Close", new Vector2(597, 81), ()=> IsPause = false),
+            new ("Controls/ExitMenu", new Vector2(299, 280), () => GameView.ChangeMenu(GameMenu.GetObject))
         };
         
         _background = new Image("Controls/PauseMenu", new Vector2(155, 88));

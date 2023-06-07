@@ -38,11 +38,6 @@ public abstract class Level<T> : Component where T : new ()
         }
     }
     
-    public void Reset()
-    {
-        _object = default;
-    }
-    
     protected abstract double HealthDefault { get; init; }
 
     private double _health;

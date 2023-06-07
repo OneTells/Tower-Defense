@@ -35,7 +35,7 @@ public class StoreMenu : Menu<StoreMenu>
             {
                 Texts = new Dictionary<string, Text>
                 {
-                    { "percent", new Text("Fonts/Font1", new Vector2(410, 114), $"+{10*_power}%") },
+                    { "percent", new Text("Fonts/Font1", new Vector2(410, 114), $"+{10*_power}%", false) },
                     { "star", new Text("Fonts/Font1", new Vector2(520, 145), $"{_power + 1}") }
                 }
             }},
@@ -43,7 +43,7 @@ public class StoreMenu : Menu<StoreMenu>
             {
                 Texts = new Dictionary<string, Text>
                 {
-                    {"percent", new Text("Fonts/Font1", new Vector2(466, 321), $"+{10*_speed}%")},
+                    {"percent", new Text("Fonts/Font1", new Vector2(466, 321), $"+{10*_speed}%", false)},
                     {"star", new Text("Fonts/Font1", new Vector2(520, 353), $"{_speed + 1}")}
                 }
             }},
@@ -51,7 +51,7 @@ public class StoreMenu : Menu<StoreMenu>
             {
                 Texts = new Dictionary<string, Text>
                 {
-                    { "percent", new Text("Fonts/Font1", new Vector2(486, 216), $"+{10*_length}%") },
+                    { "percent", new Text("Fonts/Font1", new Vector2(486, 216), $"+{10*_length}%", false) },
                     { "star", new Text("Fonts/Font1", new Vector2(520, 250), $"{_length + 1}") }
                 }
             }},
