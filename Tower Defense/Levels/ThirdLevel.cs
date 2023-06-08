@@ -56,4 +56,5 @@ public sealed class ThirdLevel : Level<ThirdLevel>
             new(324, 120), new (388, 120), new (452, 120)
         };
     }
+    
 }
