@@ -18,9 +18,9 @@ public class Pause<T> : Component where T : new()
     {
         _buttons = new List<Button>
         {
-            new ("Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject)),
+            new ("Controls/ExitMenu", new Vector2(299, 185), () => GameView.ChangeMenu(GameMenu.GetObject)),
             new ("Controls/Close", new Vector2(597, 81), ()=> IsPause = false),
-            new ("Controls/ExitMenu", new Vector2(299, 280), () => (GameView.CurrentMenu as Level<T>)!.Reset())
+            new ("Level/Pause/Restart", new Vector2(299, 250), () => (GameView.CurrentMenu as Level<T>)!.Reset())
         };
         
         _background = new Image("Controls/PauseMenu", new Vector2(155, 88));

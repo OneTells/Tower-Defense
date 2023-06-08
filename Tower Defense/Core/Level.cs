@@ -54,6 +54,8 @@ public abstract class Level<T> : Component where T : new ()
     private double _health;
     private double _speed = 1;
 
+    public int Coin;
+    
     #region MenuElements
 
     private Image _healthImage;
@@ -61,7 +63,7 @@ public abstract class Level<T> : Component where T : new ()
     private Button _speedButton;
     private Button _pauseButton;
     
-    private readonly List<Button> _platforms = new ();
+    private readonly List<Tower<T>> _platforms = new ();
     private readonly HashSet<Image> _ways = new ();
     private readonly List<Opponent> _opponents = new ();
     
@@ -69,7 +71,6 @@ public abstract class Level<T> : Component where T : new ()
     
     private readonly Pause<T> _pause = new ();
     private readonly EndGame<T> _endGame = new ();
-    private readonly AddTower _addTower = new ();
     
     private List<List<Opponent>> _waves = new ();
     private int _indexOpponent;
@@ -157,7 +158,7 @@ public abstract class Level<T> : Component where T : new ()
         }
         
         foreach (var platform in InitializationPlatforms())
-            _platforms.Add(new Button("Level/Map/Platform", platform, () => _addTower.IsAddTower = true));
+            _platforms.Add(new Tower<T>(platform));
     }
     
     private void Initialization()
@@ -185,12 +186,6 @@ public abstract class Level<T> : Component where T : new ()
         if (_pause.IsPause)
         {
             _pause.Update();
-            return;
-        }
-        
-        if (_addTower.IsAddTower)
-        {
-            _addTower.Update();
             return;
         }
         
@@ -252,14 +247,14 @@ public abstract class Level<T> : Component where T : new ()
         foreach (var way in _ways) 
             way.Draw();
         
-        foreach (var platform in _platforms) 
-            platform.Draw();
-        
         foreach (var portal in _portals) 
             portal.Draw();
         
         foreach (var opponent in _opponents) 
             opponent.Draw();
+        
+        foreach (var platform in _platforms) 
+            platform.Draw();
         
         _stage.Draw();
         _healthImage.Draw();
@@ -273,12 +268,6 @@ public abstract class Level<T> : Component where T : new ()
         if (_endGame.IsEndGame)
         {
             _endGame.Draw();
-            return;
-        }
-        
-        if (_addTower.IsAddTower)
-        {
-            _addTower.Draw();
             return;
         }
         
