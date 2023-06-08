@@ -79,6 +79,8 @@ public abstract class Level<T> : Component where T : new ()
     
     private Background _background;
 
+    private readonly HashSet<Image> _portals = new ();
+    
     private void ChangeSpeed()
     {
         _speed = _speed switch {1 => 3, 3 => 5, 5 => 10, 10 => 0.5, 0.5 => 1, _ => _speed};
@@ -118,7 +120,10 @@ public abstract class Level<T> : Component where T : new ()
             var current = trackCodes[a].start;
             var code =trackCodes[a].code + "e";
 
-            _ways.Add(new Image("Controls/Path", new Vector2(current.X - 32, current.Y - 32)));
+            _ways.Add(new Image("Level/Map/Path", new Vector2(current.X - 32, current.Y - 32)));
+            
+            _portals.Add(new Image("Level/Map/Start", new Vector2(current.X - 32, current.Y - 32)));
+            
             Tracks.Add(new List<Vector2> {current});
                         
             for (var i = 0; i < code.Length - 1; i++)
@@ -142,12 +147,14 @@ public abstract class Level<T> : Component where T : new ()
                 if (code[i] != code[i + 1])
                     Tracks[a].Add(current);
 
-                _ways.Add(new Image("Controls/Path", new Vector2(current.X - 32, current.Y - 32)));
+                _ways.Add(new Image("Level/Map/Path", new Vector2(current.X - 32, current.Y - 32)));
             }
+            
+            _portals.Add(new Image("Level/Map/Finish", new Vector2(current.X - 32, current.Y - 32)));
         }
         
         foreach (var platform in InitializationPlatforms())
-            _platforms.Add(new Button("Controls/Path", platform, () => _addTower.IsAddTower = true));
+            _platforms.Add(new Button("Level/Map/Platform", platform, () => _addTower.IsAddTower = true));
     }
 
     protected abstract List<(string code, Vector2 start)> InitializationTrackCodes();
@@ -234,6 +241,9 @@ public abstract class Level<T> : Component where T : new ()
         
         foreach (var platform in _platforms) 
             platform.Draw();
+        
+        foreach (var portal in _portals) 
+            portal.Draw();
         
         foreach (var opponent in _opponents) 
             opponent.Draw();
