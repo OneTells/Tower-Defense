@@ -7,9 +7,9 @@ namespace Tower_Defense.Core.Level;
 
 public static class OpponentVariants
 {
-    public static readonly (int health, double speed, string textureName) Normal = (10, 1, "Level/Opponent/Circle");
-    public static readonly (int health, double speed, string textureName) Flash = (5, 2, "Level/Opponent/Square");
-    public static readonly (int health, double speed, string textureName) Hulk = (20, 0.5, "Level/Opponent/Triangle");
+    public static readonly (int health, double speed, string textureName) Normal = (4, 1, "Level/Opponent/Circle");
+    public static readonly (int health, double speed, string textureName) Flash = (2, 2, "Level/Opponent/Square");
+    public static readonly (int health, double speed, string textureName) Hulk = (6, 0.5, "Level/Opponent/Triangle");
 }
 
 public class Opponent: Component

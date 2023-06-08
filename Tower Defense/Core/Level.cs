@@ -54,7 +54,7 @@ public abstract class Level<T> : Component where T : new ()
     private double _health;
     private double _speed = 1;
 
-    public int Coin;
+    public int Coin = 500;
     
     #region MenuElements
 

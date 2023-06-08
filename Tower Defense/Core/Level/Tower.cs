@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Tower_Defense.Core.Elements;
 
 namespace Tower_Defense.Core.Level;
 
 public static class TowerVariants
 {
-    public static readonly (double damage, double speed, double range, string textureName) One = (1, 1, 1, "Level/Tower/One");
-    public static readonly (double damage, double speed, double range, string textureName) Two = (3, 1, 1, "Level/Tower/Two");
-    public static readonly (double damage, double speed, double range, string textureName) Three = (1, 5, 1, "Level/Tower/Three");
-    public static readonly (double damage, double speed, double range, string textureName) Four = (2, 2, 5, "Level/Tower/Four");
+    public static readonly (double damage, double speed, double range, string textureName) One = (1, 1, 1, "One");
+    public static readonly (double damage, double speed, double range, string textureName) Two = (3, 1, 1, "Two");
+    public static readonly (double damage, double speed, double range, string textureName) Three = (1, 5, 1, "Three");
+    public static readonly (double damage, double speed, double range, string textureName) Four = (2, 2, 5, "Four");
 }
 
 public class Tower<T>: Component where T : new()
@@ -25,6 +26,7 @@ public class Tower<T>: Component where T : new()
     public double Damage;
     public double Speed;
     public double Range;
+    private string _texture;
     
     private Button _platform;
     private readonly Vector2 _position;
@@ -51,10 +53,13 @@ public class Tower<T>: Component where T : new()
         Damage = tower.damage;
         Speed = tower.speed;
         Range = tower.range;
+        Range = tower.range;
+        _texture = tower.textureName;
+        
         IsInit = true;
         IsAddTower = false;
         
-        _platform = new Button(tower.textureName, _position, Click);
+        _platform = new Button("Level/Tower/" + tower.textureName, _position, Click);
     }
     
     public Tower(Vector2 position)
@@ -95,6 +100,12 @@ public class Tower<T>: Component where T : new()
     public override void Draw()
     {
         _platform.Draw();
+
+        if (IsInit)
+        {
+            var texture = Content.Load<Texture2D>($"Level/Tower/{_texture}Head");
+            Sprite.Draw(Content.Load<Texture2D>($"Level/Tower/{_texture}Head"), new Rectangle((int) _position.X, (int) _position.Y, texture.Width, texture.Height), Color.White);
+        }
         
         if (IsAddTower)
         {

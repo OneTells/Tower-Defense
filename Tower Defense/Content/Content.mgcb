@@ -668,6 +668,18 @@
 /processorParam:TextureFormat=Color
 /build:Level/Tower/Four.png
 
+#begin Level/Tower/FourHead.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Level/Tower/FourHead.png
+
 #begin Level/Tower/One.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -679,6 +691,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Level/Tower/One.png
+
+#begin Level/Tower/OneHead.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Level/Tower/OneHead.png
 
 #begin Level/Tower/Three.png
 /importer:TextureImporter
@@ -692,6 +716,18 @@
 /processorParam:TextureFormat=Color
 /build:Level/Tower/Three.png
 
+#begin Level/Tower/ThreeHead.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Level/Tower/ThreeHead.png
+
 #begin Level/Tower/Two.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -703,4 +739,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Level/Tower/Two.png
+
+#begin Level/Tower/TwoHead.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Level/Tower/TwoHead.png
 
