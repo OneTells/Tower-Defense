@@ -59,6 +59,7 @@ public abstract class Level<T> : Component where T : new ()
     #region MenuElements
 
     private Image _healthImage;
+    private Image _coinImage;
     
     private Button _speedButton;
     private Button _pauseButton;
@@ -107,6 +108,14 @@ public abstract class Level<T> : Component where T : new ()
             Texts = new Dictionary<string, Text>
             {
                 {"text", new Text("Fonts/Font1", new Vector2(630, 10), $"{_health}", false)}
+            }
+        };
+        
+        _coinImage = new Image("Level/Coin", new Vector2(700, 10))
+        {
+            Texts = new Dictionary<string, Text>
+            {
+                {"text", new Text("Fonts/Font1", new Vector2(730, 10), $"{Coin}", false)}
             }
         };
         
@@ -189,10 +198,12 @@ public abstract class Level<T> : Component where T : new ()
             return;
         }
         
+        
         _pauseButton.Update();
         _speedButton.Update();
         
         _stage.Texts["text"].Caption = $"{_indexWave + 1}/{_waves.Count}";
+        _coinImage.Texts["text"].Caption = $"{Coin}";
         
         if (_opponents.Count == 0 && _indexOpponent == _waves[_indexWave].Count)
         {
@@ -258,6 +269,7 @@ public abstract class Level<T> : Component where T : new ()
         
         _stage.Draw();
         _healthImage.Draw();
+        _coinImage.Draw();
         
         if (_pause.IsPause)
         {
