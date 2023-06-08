@@ -167,7 +167,7 @@ public abstract class Level<T> : Component where T : new ()
         }
         
         foreach (var platform in InitializationPlatforms())
-            _platforms.Add(new Tower<T>(platform, ref _speed));
+            _platforms.Add(new Tower<T>(platform));
     }
     
     private void Initialization()
@@ -222,6 +222,7 @@ public abstract class Level<T> : Component where T : new ()
         foreach (var opponent in new List<Opponent>(Opponents).Where(opponent => opponent.Health <= 0))
         {
             Opponents.Remove(opponent);
+            Coin += 5;
         }
         
         foreach (var opponent in new List<Opponent>(Opponents).Where(opponent => opponent.TrackIndex >= opponent.Track.Count))
@@ -251,9 +252,13 @@ public abstract class Level<T> : Component where T : new ()
             opponent.Speed = opponent.SpeedDefault * _speed;
             opponent.Update();
         }
-        
+
         foreach (var platform in _platforms)
+        {
+            platform.SpeedGame = _speed;
             platform.Update();
+        }
+            
     }
 
     public override void Draw()
@@ -268,8 +273,8 @@ public abstract class Level<T> : Component where T : new ()
         
         foreach (var opponent in Opponents) 
             opponent.Draw();
-        
-        foreach (var platform in _platforms) 
+
+        foreach (var platform in _platforms)
             platform.Draw();
         
         _stage.Draw();

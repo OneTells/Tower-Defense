@@ -5,7 +5,7 @@ using Tower_Defense.Core.Level;
 
 namespace Tower_Defense.Levels;
 
-public sealed class FirstLevel : Level<FirstLevel>
+public sealed class ThirdLevel : Level<ThirdLevel>
 {
     protected override double HealthDefault { get; init; } = 500;
     

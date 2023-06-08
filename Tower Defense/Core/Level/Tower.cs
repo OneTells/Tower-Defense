@@ -29,7 +29,7 @@ public class Tower<T>: Component where T : new()
     public double Range;
     private string _texture;
     
-    private double _speed;
+    public double SpeedGame = 1;
     
     private Button _platform;
     private readonly Vector2 _position;
@@ -69,10 +69,9 @@ public class Tower<T>: Component where T : new()
         _platform = new Button("Level/Tower/" + tower.textureName, _position, Click);
     }
     
-    public Tower(Vector2 position, ref double speed)
+    public Tower(Vector2 position)
     {
         _position = position;
-        _speed = speed;
         
         LoadContent();
     }
@@ -110,7 +109,7 @@ public class Tower<T>: Component where T : new()
         if (!IsInit)
             return;
         
-        if (DateTime.Now.Subtract(_time).TotalSeconds >= 1 / Speed / _speed)
+        if (DateTime.Now.Subtract(_time).TotalSeconds >= 1.0 / Speed / SpeedGame)
         {
             foreach (var opponent in (GameView.CurrentMenu as Level<T>)!.Opponents)
             {

@@ -28,17 +28,17 @@ public class Bullet: Component
         if (Math.Abs(Opponent.Position.X - Position.X) > 1)
         {
             if (Opponent.Position.X >Position.X)
-                Position.X += float.Min(5 * (float) Opponent.Speed, Math.Abs(Opponent.Position.X - Position.X));
+                Position.X += float.Min((float)(3 * (float) Opponent.Speed / Opponent.SpeedDefault), Math.Abs(Opponent.Position.X - Position.X));
             else
-                Position.X -= float.Min(5 * (float) Opponent.Speed, Math.Abs(Opponent.Position.X - Position.X));
+                Position.X -= float.Min((float)(3 * (float) Opponent.Speed / Opponent.SpeedDefault), Math.Abs(Opponent.Position.X - Position.X));
         }
         
         if (Math.Abs(Opponent.Position.Y - Position.Y) > 1)
         {
             if (Opponent.Position.Y >Position.Y)
-                Position.Y += float.Min(5 * (float) Opponent.Speed, Math.Abs(Opponent.Position.Y - Position.Y));
+                Position.Y += float.Min((float)(3 * (float) Opponent.Speed / Opponent.SpeedDefault), Math.Abs(Opponent.Position.Y - Position.Y));
             else
-                Position.Y -= float.Min(5 * (float) Opponent.Speed, Math.Abs(Opponent.Position.Y - Position.Y));
+                Position.Y -= float.Min((float)(3 * (float) Opponent.Speed / Opponent.SpeedDefault), Math.Abs(Opponent.Position.Y - Position.Y));
         }
         
         _image.Position = Position;
