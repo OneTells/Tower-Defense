@@ -66,7 +66,7 @@ public abstract class Level<T> : Component where T : new ()
     
     private readonly List<Tower<T>> _platforms = new ();
     private readonly HashSet<Image> _ways = new ();
-    private readonly List<Opponent> _opponents = new ();
+    public readonly List<Opponent> Opponents = new ();
     
     #endregion
     
@@ -167,7 +167,7 @@ public abstract class Level<T> : Component where T : new ()
         }
         
         foreach (var platform in InitializationPlatforms())
-            _platforms.Add(new Tower<T>(platform));
+            _platforms.Add(new Tower<T>(platform, ref _speed));
     }
     
     private void Initialization()
@@ -205,7 +205,7 @@ public abstract class Level<T> : Component where T : new ()
         _stage.Texts["text"].Caption = $"{_indexWave + 1}/{_waves.Count}";
         _coinImage.Texts["text"].Caption = $"{Coin}";
         
-        if (_opponents.Count == 0 && _indexOpponent == _waves[_indexWave].Count)
+        if (Opponents.Count == 0 && _indexOpponent == _waves[_indexWave].Count)
         {
             _indexWave++;
             _indexOpponent = 0;
@@ -213,24 +213,29 @@ public abstract class Level<T> : Component where T : new ()
         
         if (_indexOpponent != _waves[_indexWave].Count && DateTime.Now.Subtract(_startLevelTime).TotalSeconds >= _waves[_indexWave][_indexOpponent].TimeOut / _speed)
         {
-            _opponents.Add(_waves[_indexWave][_indexOpponent]);
+            Opponents.Add(_waves[_indexWave][_indexOpponent]);
 
             _indexOpponent += 1;
             _startLevelTime = DateTime.Now;
         }
         
-        foreach (var opponent in new List<Opponent>(_opponents).Where(opponent => opponent.TrackIndex >= opponent.Track.Count))
+        foreach (var opponent in new List<Opponent>(Opponents).Where(opponent => opponent.Health <= 0))
+        {
+            Opponents.Remove(opponent);
+        }
+        
+        foreach (var opponent in new List<Opponent>(Opponents).Where(opponent => opponent.TrackIndex >= opponent.Track.Count))
         {
             _health -= 1;
             _healthImage.Texts["text"].Caption = $"{_health}";
             
-            _opponents.Remove(opponent);
+            Opponents.Remove(opponent);
 
             if (_health == 0) 
                 break;
         }
 
-        if (_opponents.Count == 0 && _indexWave + 1 == _waves.Count && _indexOpponent == _waves[_indexWave].Count || _health == 0)
+        if (Opponents.Count == 0 && _indexWave + 1 == _waves.Count && _indexOpponent == _waves[_indexWave].Count || _health == 0)
         {
             var starCount = (_health / HealthDefault) switch { >= 0.9 => 3, >= 0.8 => 2, >= 0.4 => 1, _ => 0};
             
@@ -241,7 +246,7 @@ public abstract class Level<T> : Component where T : new ()
             return;
         }
         
-        foreach (var opponent in _opponents)
+        foreach (var opponent in Opponents)
         {
             opponent.Speed = opponent.SpeedDefault * _speed;
             opponent.Update();
@@ -261,7 +266,7 @@ public abstract class Level<T> : Component where T : new ()
         foreach (var portal in _portals) 
             portal.Draw();
         
-        foreach (var opponent in _opponents) 
+        foreach (var opponent in Opponents) 
             opponent.Draw();
         
         foreach (var platform in _platforms) 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tower_Defense.Core.Elements;
@@ -7,10 +8,10 @@ namespace Tower_Defense.Core.Level;
 
 public static class TowerVariants
 {
-    public static readonly (double damage, double speed, double range, string textureName) One = (1, 1, 1, "One");
-    public static readonly (double damage, double speed, double range, string textureName) Two = (3, 1, 1, "Two");
-    public static readonly (double damage, double speed, double range, string textureName) Three = (1, 5, 1, "Three");
-    public static readonly (double damage, double speed, double range, string textureName) Four = (2, 2, 5, "Four");
+    public static readonly (double damage, double speed, double range, string textureName) One = (1, 1, 128, "One");
+    public static readonly (double damage, double speed, double range, string textureName) Two = (3, 1, 128, "Two");
+    public static readonly (double damage, double speed, double range, string textureName) Three = (1, 5, 128, "Three");
+    public static readonly (double damage, double speed, double range, string textureName) Four = (2, 2, 320, "Four");
 }
 
 public class Tower<T>: Component where T : new()
@@ -28,9 +29,15 @@ public class Tower<T>: Component where T : new()
     public double Range;
     private string _texture;
     
+    private double _speed;
+    
     private Button _platform;
     private readonly Vector2 _position;
 
+    private List<Bullet> _bullets =  new ();
+    
+    private DateTime _time;
+    
     private void Click()
     {
         if (!IsInit)
@@ -62,14 +69,18 @@ public class Tower<T>: Component where T : new()
         _platform = new Button("Level/Tower/" + tower.textureName, _position, Click);
     }
     
-    public Tower(Vector2 position)
+    public Tower(Vector2 position, ref double speed)
     {
         _position = position;
+        _speed = speed;
+        
         LoadContent();
     }
     
     private void LoadContent()
     {
+        _time = DateTime.Now;
+        
         _platform = new Button("Level/Map/Platform", _position, Click);
         
         _buttonsAdd = new List<Button>
@@ -95,6 +106,34 @@ public class Tower<T>: Component where T : new()
         }
         
         _platform.Update();
+        
+        if (!IsInit)
+            return;
+        
+        if (DateTime.Now.Subtract(_time).TotalSeconds >= 1 / Speed / _speed)
+        {
+            foreach (var opponent in (GameView.CurrentMenu as Level<T>)!.Opponents)
+            {
+                if ((opponent.Position.X - _position.X) * (opponent.Position.X - _position.X) +
+                    (opponent.Position.Y - _position.Y) * (opponent.Position.Y - _position.Y) <= Range * Range)
+                {
+                    _bullets.Add(new Bullet(_position, opponent));
+                    _time = DateTime.Now;
+                    break;
+                }
+            }
+        }
+        
+        foreach (var bullet in new List<Bullet>(_bullets))
+        {
+            bullet.Update();
+            
+            if (Math.Abs(bullet.Opponent.Position.Y - bullet.Position.Y) <= 1)
+            {
+                bullet.Opponent.Health -= Damage;
+                _bullets.Remove(bullet);
+            }
+        }
     }
 
     public override void Draw()
@@ -115,6 +154,13 @@ public class Tower<T>: Component where T : new()
             foreach (var button in _buttonsAdd)
                 button.Draw();
         }
-
+        
+        if (!IsInit)
+            return;
+        
+        foreach (var bullet in _bullets)
+        {
+            bullet.Draw();
+        }
     }
 }

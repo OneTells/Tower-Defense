@@ -38,7 +38,7 @@ public sealed class FirstLevel : Level<FirstLevel>
     {
         return new List<Vector2>
         {
-            new (420, 120)
+            new (320, 120)
         };
     }
 }
