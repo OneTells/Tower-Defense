@@ -68,7 +68,7 @@ public abstract class Level<T> : Component where T : new ()
     #endregion
     
     private readonly Pause<T> _pause = new ();
-    private readonly EndGame _endGame = new ();
+    private readonly EndGame<T> _endGame = new ();
     private readonly AddTower _addTower = new ();
     
     private List<List<Opponent>> _waves = new ();

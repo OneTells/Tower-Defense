@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Tower_Defense.Core.Elements;
 using Tower_Defense.Menu;
 
 namespace Tower_Defense.Core.Level;
 
-public class EndGame: Component
+public class EndGame<T>: Component where T : new()
 {
     private List<Vector2> _starPositions;
-    private Button _button;
+    private List<Button> _buttons;
+    
+    private Image _background;
     
     public int StartCount;
     public bool IsEndGame;
@@ -20,20 +21,27 @@ public class EndGame: Component
     {
         _starPositions = new List<Vector2> { new (342, 120), new (384, 120), new (426, 120)};
         
-        _button = new Button(
-            "Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject)
-        );
+        _buttons = new List<Button>
+        {
+            new ("Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject)),
+            new ("Controls/ExitMenu", new Vector2(299, 280), () => (GameView.CurrentMenu as Level<T>)!.Reset())
+        };
+        
+        _background = new Image("Controls/EndGame", new Vector2(163, 88));
     }
     
     public override void Update()
     {
-        _button.Update();
+        foreach (var button in _buttons)
+            button.Update();
     }
 
     public override void Draw()
     {
-        Sprite.Draw(Content.Load<Texture2D>("Controls/EndGame"), new Vector2(163, 88), Color.White);
-        _button.Draw();
+        _background.Draw();
+        
+        foreach (var button in _buttons)
+            button.Draw();
             
         for (var i = 0; i < StartCount; i++)
             new Image("Controls/Star+", _starPositions[i]).Draw();
