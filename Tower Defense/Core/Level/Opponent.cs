@@ -21,7 +21,8 @@ public class Opponent: Component
 
     public readonly Texture2D Texture;
 
-    public int Health;
+    public double Health;
+    private readonly double _healthDefault;
     public readonly double SpeedDefault;
     public double Speed;
     public readonly double TimeOut;
@@ -31,6 +32,7 @@ public class Opponent: Component
         TimeOut = timeOut;
         
         Health = opponent.health;
+        _healthDefault = opponent.health;
         SpeedDefault = opponent.speed;
         Speed = SpeedDefault;
         Texture = Content.Load<Texture2D>(opponent.textureName);
@@ -41,6 +43,17 @@ public class Opponent: Component
     public override void Draw()
     {
         Sprite.Draw(Texture, _position, Color.White);
+
+        var healthTexture = Content.Load<Texture2D>("Level/Opponent/Health/" + (Health / _healthDefault) switch
+        {
+            >= 1 => "100", >= 0.9 => "90", >= 0.8 => "80", >= 0.7 => "70", >= 0.6 => "60", >= 0.5 => "50", >= 0.4 => "40",
+            >= 0.3 => "30", >= 0.2 => "20", >= 0.1 => "10", _ => "100"
+        });
+        
+        Sprite.Draw(
+            healthTexture, 
+            new Vector2(_position.X + Texture.Width / (float) 2 - healthTexture.Width / (float) 2, _position.Y - 5 - healthTexture.Height), Color.White
+      );
     }
 
     public override void Update()

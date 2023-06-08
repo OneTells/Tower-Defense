@@ -35,6 +35,8 @@ public abstract class Level<T> : Component where T : new ()
             
             (_object as Level<T>)!._waves = (_object as Level<T>)?.InitializationWaves();
             
+            (_object as Level<T>)?.Initialization();
+            
             return _object;
         }
     }
@@ -80,13 +82,14 @@ public abstract class Level<T> : Component where T : new ()
     private Background _background;
 
     private readonly HashSet<Image> _portals = new ();
+    private Image _stage;
     
     private void ChangeSpeed()
     {
         _speed = _speed switch {1 => 3, 3 => 5, 5 => 10, 10 => 0.5, 0.5 => 1, _ => _speed};
         
         _speedButton.Texture = Content.Load<Texture2D>(
-            "Level/Time/" +_speed switch {1 => "1", 3 => "3", 5 => "5", 10 => "10", 0.5 => "0", _ => "1"}
+            "Level/Time/" + _speed switch {1 => "1", 3 => "3", 5 => "5", 10 => "10", 0.5 => "0", _ => "1"}
         );
     }
     
@@ -98,11 +101,11 @@ public abstract class Level<T> : Component where T : new ()
                 
         _background = new Background("Background/Level");
         
-        _healthImage = new Image("Controls/Health", new Vector2(710, 10))
+        _healthImage = new Image("Level/Health", new Vector2(600, 10))
         {
             Texts = new Dictionary<string, Text>
             {
-                {"text", new Text("Fonts/Font1", new Vector2(700, 28), $"{_health}")}
+                {"text", new Text("Fonts/Font1", new Vector2(630, 10), $"{_health}", false)}
             }
         };
         
@@ -156,7 +159,15 @@ public abstract class Level<T> : Component where T : new ()
         foreach (var platform in InitializationPlatforms())
             _platforms.Add(new Button("Level/Map/Platform", platform, () => _addTower.IsAddTower = true));
     }
-
+    
+    private void Initialization()
+    {
+        _stage = new Image("Level/Stage", new Vector2(500, 10))
+        {
+            Texts = new Dictionary<string, Text> { {"text", new Text("Fonts/Font1", new Vector2(530, 10), $"{_indexWave + 1}/{_waves.Count}", false)} }
+        };
+    }
+    
     protected abstract List<(string code, Vector2 start)> InitializationTrackCodes();
     
     protected abstract List<List<Opponent>> InitializationWaves();
@@ -185,6 +196,8 @@ public abstract class Level<T> : Component where T : new ()
         
         _pauseButton.Update();
         _speedButton.Update();
+        
+        _stage.Texts["text"].Caption = $"{_indexWave + 1}/{_waves.Count}";
         
         if (_opponents.Count == 0 && _indexOpponent == _waves[_indexWave].Count)
         {
@@ -248,6 +261,7 @@ public abstract class Level<T> : Component where T : new ()
         foreach (var opponent in _opponents) 
             opponent.Draw();
         
+        _stage.Draw();
         _healthImage.Draw();
         
         if (_pause.IsPause)
