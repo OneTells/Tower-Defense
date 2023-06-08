@@ -13,7 +13,7 @@ public sealed class ThirdLevel : Level<ThirdLevel>
     {
         return new List<(string code, Vector2 start)>
         {
-            ("rrrddrrr", new Vector2(100, 120))
+            ("rrrurrrrdrr", new Vector2(100, 120))
         };
     }
 
@@ -53,7 +53,7 @@ public sealed class ThirdLevel : Level<ThirdLevel>
     {
         return new List<Vector2>
         {
-            new (132, 152), new (196, 152), new (324, 152), new (388, 152)
+            new(324, 120), new (388, 120), new (452, 120)
         };
     }
 }
