@@ -9,13 +9,14 @@ namespace Tower_Defense.Core.Elements;
 public class Button : Component
 {
     private MouseState _currentMouse;
-        
+    
     private bool _isSelect;
     
-    public Texture2D Texture;
     private readonly Vector2 _position;
     private readonly Action _click;
-
+    
+    public Texture2D Texture;
+    
     private Rectangle Rectangle => new ((int) _position.X, (int) _position.Y, Texture.Width, Texture.Height);
 
     public Dictionary<string, Text> Texts = new ();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Tower_Defense.Core;
+namespace Tower_Defense.Core.Elements;
 
 public class Background : Component
 {
@@ -12,10 +12,10 @@ public class Background : Component
         _texture = Content.Load<Texture2D>(assetName);
     }
     
+    public override void Update() {}
+    
     public override void Draw()
     {
         Sprite.Draw(_texture, new Vector2(0, 0), Color.White);
     }
-
-    public override void Update() {}
 }

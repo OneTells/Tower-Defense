@@ -12,7 +12,6 @@ namespace Tower_Defense.Core.Elements
         public bool IsSelect;
         public string Caption;
 
-        
         public Text(string fontName, Vector2 position, string caption)
         {
             _position = position;
