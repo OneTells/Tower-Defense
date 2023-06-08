@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Tower_Defense.Core;
+using Tower_Defense.Core.Level;
 
 namespace Tower_Defense.Levels;
 

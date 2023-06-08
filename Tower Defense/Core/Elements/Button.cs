@@ -12,17 +12,17 @@ public class Button : Component
         
     private bool _isSelect;
     
-    private readonly Texture2D _texture;
+    public Texture2D Texture;
     private readonly Vector2 _position;
     private readonly Action _click;
 
-    private Rectangle Rectangle => new ((int) _position.X, (int) _position.Y, _texture.Width, _texture.Height);
+    private Rectangle Rectangle => new ((int) _position.X, (int) _position.Y, Texture.Width, Texture.Height);
 
     public Dictionary<string, Text> Texts = new ();
 
     public Button(string textureName, Vector2 position, Action click)
     {
-        _texture = Content.Load<Texture2D>(textureName);
+        Texture = Content.Load<Texture2D>(textureName);
         _position = position;
         _click = click;
     }
@@ -40,7 +40,7 @@ public class Button : Component
     
     public override void Draw()
     {
-        Sprite.Draw(_texture, Rectangle, _isSelect ? Color.Gray : Color.White);
+        Sprite.Draw(Texture, Rectangle, _isSelect ? Color.Gray : Color.White);
         
         foreach (var (_, text) in Texts)
         {

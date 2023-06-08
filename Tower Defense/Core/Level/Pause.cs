@@ -5,21 +5,13 @@ using Tower_Defense.Menu;
 
 namespace Tower_Defense.Core.Level;
 
-public class Pause<T> : Component
+public class Pause<T> : Component where T : new()
 {
-    public bool IsReset;
-    
     private List<Button> _buttons;
     private Image _background;
     
     public bool IsPause;
-
-    private void ResetLevel()
-    {
-        IsReset = true;
-        (GameView.CurrentMenu as Level<T>);
-    }
-
+    
     public Pause() { LoadContent(); }
 
     private void LoadContent()
@@ -28,7 +20,7 @@ public class Pause<T> : Component
         {
             new ("Controls/ExitMenu", new Vector2(299, 214), () => GameView.ChangeMenu(GameMenu.GetObject)),
             new ("Controls/Close", new Vector2(597, 81), ()=> IsPause = false),
-            new ("Controls/ExitMenu", new Vector2(299, 280), ResetLevel)
+            new ("Controls/ExitMenu", new Vector2(299, 280), () => (GameView.CurrentMenu as Level<T>)!.Reset())
         };
         
         _background = new Image("Controls/PauseMenu", new Vector2(155, 88));

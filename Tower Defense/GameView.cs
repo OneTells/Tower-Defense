@@ -13,7 +13,7 @@ public class GameView : Game
     public SpriteBatch Sprite;
     
     private static GraphicsDeviceManager _graphics;
-    public static Core.Component CurrentMenu;
+    public static Core.Component CurrentMenu { get; private set; }
     
     public int StartCount = 1000;
     

@@ -8,8 +8,6 @@ namespace Tower_Defense.Core.Level;
 
 public class EndGame: Component
 {
-    public bool IsReset;
-    
     private List<Vector2> _starPositions;
     private Button _button;
     

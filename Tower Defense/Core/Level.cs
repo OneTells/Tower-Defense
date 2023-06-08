@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Tower_Defense.Core.Elements;
 using Tower_Defense.Core.Level;
 
@@ -19,7 +20,7 @@ public abstract class Level<T> : Component where T : new ()
             
             if (_object != null)
             {
-                if ((_object as Level<T>)!._pause.IsReset || (_object as Level<T>)!._endGame.IsReset ||  (_object as Level<T>)!._endGame.IsEndGame)
+                if ((_object as Level<T>)!._isReset ||  (_object as Level<T>)!._endGame.IsEndGame)
                     star = (_object as Level<T>)!._endGame.StartCount;
                 else
                     return _object;
@@ -37,6 +38,14 @@ public abstract class Level<T> : Component where T : new ()
             return _object;
         }
     }
+    
+    public void Reset()
+    {
+        _isReset = true;
+        GameView.ChangeMenu(GetObject as Component);
+    }
+
+    private bool _isReset;
     
     protected abstract double HealthDefault { get; init; }
 
@@ -70,6 +79,15 @@ public abstract class Level<T> : Component where T : new ()
     
     private Background _background;
 
+    private void ChangeSpeed()
+    {
+        _speed = _speed switch {1 => 3, 3 => 5, 5 => 10, 10 => 0.5, 0.5 => 1, _ => _speed};
+        
+        _speedButton.Texture = Content.Load<Texture2D>(
+            "Level/Time/" +_speed switch {1 => "1", 3 => "3", 5 => "5", 10 => "10", 0.5 => "0", _ => "1"}
+        );
+    }
+    
     private void LoadContent()
     {
         _startLevelTime = DateTime.Now;
@@ -86,11 +104,7 @@ public abstract class Level<T> : Component where T : new ()
             }
         };
         
-        _speedButton = new Button(
-            "Controls/Pause", 
-            new Vector2(10, 300), 
-            ()=> _speed = _speed switch {1 => 3, 3 => 5, 5 => 10, 10 => 0.5, 0.5 => 1, _ => _speed}
-        );
+        _speedButton = new Button( "Level/Time/1",  new Vector2(10, 370), ChangeSpeed);
         
         _pauseButton = new Button("Controls/Pause", new Vector2(10, 10), () => _pause.IsPause = true);
     }
