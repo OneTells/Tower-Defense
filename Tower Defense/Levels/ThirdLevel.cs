@@ -53,8 +53,7 @@ public sealed class ThirdLevel : Level<ThirdLevel>
     {
         return new List<Vector2>
         {
-            new(324, 120), new (388, 120), new (452, 120)
+            new(324, 88), new (388, 88), new (452, 88)
         };
     }
-    
 }
